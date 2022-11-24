@@ -14,14 +14,8 @@ def salir(signum, frame):
     exit()
     
 def detect(canal):
-    global timer
     global contador
-    if timer == False:
-        signal.alarm(1)
-        contador = 1
-        timer = True
-    else:
-        contador = contador +1
+    contador = contador + 1
         
 def detectEcho(canal):
     global timeUP, estado, tiempoInicio
@@ -115,7 +109,7 @@ def main():
     controller.listen()
 
 gpio.add_event_detect(sensorI, gpio.RISING, callback=detect)
-gpio.add_event_detect(ULTR_S_ECHO, gpio.BOTH, callback=detect)
+gpio.add_event_detect(ULTR_S_ECHO, gpio.BOTH, callback=detectEcho)
 
 if __name__== "__main__":
     main()
