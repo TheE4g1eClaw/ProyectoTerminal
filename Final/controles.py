@@ -2,12 +2,20 @@ from carro import Carro
 import socketio
 import RPi.GPIO as gpio
 
-class ControlSIO(Carro):
-    def __init__(self, conexion: socketio.Client):
-        self.coneccion = conexion
+class ControlSIO():
+    def __init__(self, conexion: socketio.Client, cliente:Carro):
+        self.conexion = conexion
+        self.FORW_I = cliente.FORW_I
+        self.BACK_I = cliente.BACK_I
+        self.FORW_D = cliente.FORW_D
+        self.BACK_D = cliente.BACK_D
+        self.PWM = {
+            "I": cliente.PWM["I"],
+            "D": cliente.PWM["D"]
+        }
         
-        @self.conexion.on("/instruccion")
-        def instruccion(self, data):
+        @self.conexion.on("control")
+        def instruccion(data):
             if data == 0:
                 self.parar()
             elif data == 1:
@@ -41,7 +49,7 @@ class ControlSIO(Carro):
         self.PWM["D"].ChangeDutyCycle(0)
     
     def __izquierda(self):
-        gpio.output(self.FORW_I, gpio.HIGH)
+        gpio.output(self.FORW_I, gpio.LOW)
         gpio.output(self.BACK_I, gpio.LOW)
         gpio.output(self.FORW_D, gpio.HIGH)
         gpio.output(self.BACK_D, gpio.LOW)
@@ -51,8 +59,8 @@ class ControlSIO(Carro):
     def __derecha(self):
         gpio.output(self.FORW_I, gpio.HIGH)
         gpio.output(self.BACK_I, gpio.LOW)
-        gpio.output(self.FORW_D, gpio.HIGH)
+        gpio.output(self.FORW_D, gpio.LOW)
         gpio.output(self.BACK_D, gpio.LOW)
         self.PWM["I"].ChangeDutyCycle(100)
-        self.PWM["D"].ChangeDutyCycle(100)
+        self.PWM["D"].ChangeDutyCycle(0)
         

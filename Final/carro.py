@@ -1,7 +1,8 @@
 import RPi.GPIO as gpio
+from sensores import Sensores
 
 class Carro:
-    def __init__(self, pines: dict):
+    def __init__(self, pines: dict, frecuencia: int = 1):
         # Pines para el sentido de las llantas
         self.FORW_I = pines["FORW_I"]
         self.BACK_I = pines["BACK_I"]
@@ -23,8 +24,8 @@ class Carro:
         self.IR_I = pines["IR_I"]
         self.IR_D = pines["IR_D"]
         
+        self.IR_1 = pines["IR_1"]
         """# sensores de linea
-        self.IR_1 = pines[IR_1]
         self.IR_2 = pines[IR_2]
         self.IR_3 = pines[IR_3]
         self.IR_4 = pines[IR_4]
@@ -45,6 +46,7 @@ class Carro:
         gpio.setup(self.ECHO, gpio.IN)
         gpio.setup(self.IR_I, gpio.IN)
         gpio.setup(self.IR_D, gpio.IN)
+        gpio.setup(self.IR_1, gpio.IN)
 
         self.PWM = {
             "I": gpio.PWM(self.PWM_I, 100),
@@ -53,6 +55,8 @@ class Carro:
         }
         for pwm in self.PWM:
             self.PWM[pwm].start(0)
+            
+        self.sensores = Sensores(frecuencia, pines, self.PWM["US"])
     
     def fin(self):
         gpio.cleanup()
